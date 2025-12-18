@@ -2,8 +2,9 @@ services:
   - type: worker
     name: terabox-bot
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: python3 land.py
+    plan: free
     envVars:
       - key: BOT_TOKEN
-        sync: false  # Render dashboard पर set करें
+        sync: false
