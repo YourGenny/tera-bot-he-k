@@ -1,4 +1,4 @@
-# TERABOX GROUP BOT - FIXED VERSION FOR TERMUX
+# TERABOX GROUP BOT - FIXED VERSION FOR RENDER
 
 import asyncio
 import aiohttp
@@ -9,7 +9,12 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # Bot Configuration
-BOT_TOKEN = "BOT_TOKEN"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")  # ✅ CHANGED: Read from environment
+if not BOT_TOKEN:
+    print("❌ ERROR: BOT_TOKEN environment variable is not set!")
+    print("Please set BOT_TOKEN in Render dashboard Environment Variables")
+    exit(1)
+
 API_BASE = "https://teradl.tiiny.io/"
 ALLOWED_GROUPS = {
     -1003284051384: "Team Fx Main Group",
@@ -293,22 +298,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update and update.message:
         await update.message.reply_text("⚠️ An error occurred. Please try again.")
 
-# Cleanup old sessions
-async def cleanup_sessions():
-    while True:
-        await asyncio.sleep(300)  # Run every 5 minutes
-        current_time = time.time()
-        
-        # Clean old user sessions (older than 10 minutes)
-        expired_users = [
-            user_id for user_id, timestamp in user_cooldown.items()
-            if current_time - timestamp > 600
-        ]
-        for user_id in expired_users:
-            user_cooldown.pop(user_id, None)
-            user_sessions.pop(user_id, None)
-
-# Main Function
+# Main Function - ✅ UPDATED FOR RENDER
 def main():
     print("🤖 Starting Terabox Bot...")
     
@@ -325,11 +315,10 @@ def main():
     
     print("✅ Bot is running...")
     print("Creator: 𝗚𝗲𝗻𝗻𝘆🎀")
+    print("Deployed on: Render")
     
-    # Start session cleanup task
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.create_task(cleanup_sessions())
+    # ✅ REMOVED: Background cleanup task (causing issues on Render)
+    # ✅ REMOVED: asyncio loop creation (not needed for python-telegram-bot v20)
     
     # Start polling
     app.run_polling()
